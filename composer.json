@@ -1,0 +1,40 @@
+{
+  "name": "shrink/conductor-laravel",
+  "type": "library",
+  "description": "Laravel runtime dependency checks for Conductor",
+  "license": "MIT",
+  "require": {
+    "php": "^7.4"
+  },
+  "require-dev": {
+    "nunomaduro/phpinsights": "^1.14",
+    "phpunit/phpunit": "^9.0",
+    "vimeo/psalm": "^3.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "Shrink\\Conductor\\Laravel\\": "src/Laravel/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Conductor\\Laravel\\": "tests/Laravel/"
+    }
+  },
+  "scripts": {
+    "check": [
+      "@test",
+      "@static",
+      "@insights"
+    ],
+    "insights": [
+      "vendor/bin/phpinsights --ansi --no-interaction --config-path=insights.php"
+    ],
+    "static": [
+      "vendor/bin/psalm --long-progress --report=psalm.junit.xml"
+    ],
+    "test": [
+      "vendor/bin/phpunit --colors=always"
+    ]
+  }
+}
