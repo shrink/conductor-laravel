@@ -4,7 +4,10 @@
   "description": "Laravel runtime dependency checks for Conductor",
   "license": "MIT",
   "require": {
-    "php": "^7.4"
+    "php": "^7.4",
+    "illuminate/database": "^8.9",
+    "illuminate/support": "^8.9",
+    "shrink/conductor": "^0.1.0"
   },
   "require-dev": {
     "nunomaduro/phpinsights": "^1.14",
