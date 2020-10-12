@@ -1,0 +1,22 @@
+name: Test Conductor Laravel
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.4.10, 7.4]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Tests
+        run: PHP_VERSION=${{ matrix.php }} docker-compose up --exit-code-from=validation
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: '*.junit.xml'
+          name: test-reports-${{ matrix.php }}
+          if-no-files-found: error
