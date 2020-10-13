@@ -26,19 +26,9 @@ final class ShowStatusTest extends TestCase
             ->method('dependencyStatus')
             ->willReturn($pass);
 
-        ($dependencies = $this->createMock(CollectsApplicationDependencies::class))
-            ->method('dependencyById')
-            ->with('passing')
-            ->willReturn(new Dependency('passing', $passingCheck));
+        $dependency = new Dependency('passing', $passingCheck);
 
-        $dependencies
-            ->method('isDependencyRegistered')
-            ->with('passing')
-            ->willReturn(true);
-
-        $showStatus = new ShowStatus($dependencies);
-
-        $response = $showStatus->__invoke('passing');
+        $response = (new ShowStatus())->__invoke($dependency);
 
         $this->assertSame(200, $response->getStatusCode());
     }
@@ -56,37 +46,10 @@ final class ShowStatusTest extends TestCase
             ->method('dependencyStatus')
             ->willReturn($fail);
 
-        ($dependencies = $this->createMock(CollectsApplicationDependencies::class))
-            ->method('dependencyById')
-            ->with('failing')
-            ->willReturn(new Dependency('failing', $failingCheck));
+        $dependency = new Dependency('failing', $failingCheck);
 
-        $dependencies
-            ->method('isDependencyRegistered')
-            ->with('failing')
-            ->willReturn(true);
-
-        $showStatus = new ShowStatus($dependencies);
-
-        $response = $showStatus->__invoke('failing');
+        $response = (new ShowStatus())->__invoke($dependency);
 
         $this->assertSame(503, $response->getStatusCode());
-    }
-
-    /**
-     * @test
-     */
-    public function UnregisteredDependencyIdReturns404(): void
-    {
-        ($dependencies = $this->createMock(CollectsApplicationDependencies::class))
-            ->method('isDependencyRegistered')
-            ->with('dependency-not-registered')
-            ->willReturn(false);
-
-        $showStatus = new ShowStatus($dependencies);
-
-        $response = $showStatus->__invoke('dependency-not-registered');
-
-        $this->assertSame(404, $response->getStatusCode());
     }
 }
