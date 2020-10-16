@@ -25,13 +25,13 @@ final class DatabaseSchemaTest extends TestCase
                 'example_migration_2.php',
             ]);
 
-        $DatabaseSchema = new DatabaseSchema(
+        $databaseSchema = new DatabaseSchema(
             $migrator,
             'database/migrations',
             $this->createMock(Clock::class)
         );
 
-        $status = $DatabaseSchema->dependencyStatus();
+        $status = $databaseSchema->dependencyStatus();
 
         $this->assertFalse($status->hasStatusCheckPassed());
     }
@@ -45,13 +45,13 @@ final class DatabaseSchemaTest extends TestCase
             ->method('run')
             ->willReturn([]);
 
-        $DatabaseSchema = new DatabaseSchema(
+        $databaseSchema = new DatabaseSchema(
             $migrator,
             'database/migrations',
             $this->createMock(Clock::class)
         );
 
-        $status = $DatabaseSchema->dependencyStatus();
+        $status = $databaseSchema->dependencyStatus();
 
         $this->assertTrue($status->hasStatusCheckPassed());
     }
@@ -67,13 +67,13 @@ final class DatabaseSchemaTest extends TestCase
             ->with($this->anything(), ['pretend' => true])
             ->willReturn([]);
 
-        $DatabaseSchema = new DatabaseSchema(
+        $databaseSchema = new DatabaseSchema(
             $migrator,
             'database/migrations',
             $this->createMock(Clock::class)
         );
 
-        $DatabaseSchema->dependencyStatus();
+        $databaseSchema->dependencyStatus();
     }
 
     /**
@@ -87,13 +87,13 @@ final class DatabaseSchemaTest extends TestCase
             ->with(['database/migrations'], $this->anything())
             ->willReturn([]);
 
-        $DatabaseSchema = new DatabaseSchema(
+        $databaseSchema = new DatabaseSchema(
             $migrator,
             'database/migrations',
             $this->createMock(Clock::class)
         );
 
-        $DatabaseSchema->dependencyStatus();
+        $databaseSchema->dependencyStatus();
     }
 
     /**
@@ -109,13 +109,13 @@ final class DatabaseSchemaTest extends TestCase
             ->method('now')
             ->willReturn($at = new DateTimeImmutable('2018-01-01 00:00:00'));
 
-        $DatabaseSchema = new DatabaseSchema(
+        $databaseSchema = new DatabaseSchema(
             $migrator,
             'database/migrations',
             $clock
         );
 
-        $status = $DatabaseSchema->dependencyStatus();
+        $status = $databaseSchema->dependencyStatus();
 
         $this->assertEquals($at, $status->statusCheckedAt());
     }
