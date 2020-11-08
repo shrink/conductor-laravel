@@ -38,26 +38,24 @@ final class AttachDependencyParameterTest extends TestCase
             ->willReturn($dependency);
 
         ($route = $this->createMock(Route::class))
+            ->method('hasParameter')
+            ->with('dependency')
+            ->willReturn(true);
+
+        $route
+            ->method('parameter')
+            ->with('dependency')
+            ->willReturn('example-dependency');
+
+        $route
             ->expects($this->once())
             ->method('setParameter')
             ->with('dependency', $dependency);
 
         ($request = $this->createMock(Request::class))
             ->expects($this->any())
-            ->method('get')
-            ->with('dependency')
-            ->willReturn('example-dependency');
-
-        $request
-            ->expects($this->any())
             ->method('route')
             ->willReturn($route);
-
-        $request
-            ->expects($this->any())
-            ->method('has')
-            ->with('dependency')
-            ->willReturn(true);
 
         $attachDependency = new AttachDependencyParameter(
             $dependencies,
@@ -84,16 +82,15 @@ final class AttachDependencyParameterTest extends TestCase
             'dependency'
         );
 
-        ($request = $this->createMock(Request::class))
-            ->expects($this->any())
-            ->method('has')
+        ($route = $this->createMock(Route::class))
+            ->method('hasParameter')
             ->with('dependency')
             ->willReturn(false);
 
-        $request
-            ->expects($this->never())
-            ->method('get')
-            ->with('dependency');
+        ($request = $this->createMock(Request::class))
+            ->expects($this->any())
+            ->method('route')
+            ->willReturn($route);
 
         $attachDependency->handle(
             $request,
@@ -106,7 +103,16 @@ final class AttachDependencyParameterTest extends TestCase
      */
     public function RequestIsPassedThroughToNextHandler(): void
     {
-        $request = $this->createMock(Request::class);
+        ($route = $this->createMock(Route::class))
+            ->method('hasParameter')
+            ->with('dependency')
+            ->willReturn(false);
+
+        ($request = $this->createMock(Request::class))
+            ->expects($this->any())
+            ->method('route')
+            ->willReturn($route);
+
         $expectedResponse = $this->createMock(Response::class);
 
         $next = $this->getMockBuilder(StdClass::class)

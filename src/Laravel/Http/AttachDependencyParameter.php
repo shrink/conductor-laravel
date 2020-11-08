@@ -31,17 +31,20 @@ final class AttachDependencyParameter
      */
     public function handle(Request $request, callable $next): Response
     {
-        if (! $request->has($this->parameter)) {
+        /** @psalm-var \Illuminate\Routing\Route */
+        $route = $request->route();
+
+        if (! $route->hasParameter($this->parameter)) {
             /** @psalm-var \Illuminate\Http\Response */
             return $next($request);
         }
 
-        $dependency = $this->dependencies->dependencyById(
-            (string) $request->get($this->parameter)
-        );
+        /** @psalm-var string */
+        $id = $route->parameter($this->parameter);
 
-        /** @psalm-var \Illuminate\Routing\Route */
-        $route = $request->route();
+        $dependency = $this->dependencies->dependencyById(
+            (string) $id
+        );
 
         $route->setParameter($this->parameter, $dependency);
 
