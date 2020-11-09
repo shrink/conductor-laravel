@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Shrink\Conductor\Laravel\Http;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Shrink\Conductor\Laravel\CollectsApplicationDependencies;
+use Symfony\Component\HttpFoundation\Response;
 
 final class AttachDependencyParameter
 {
@@ -35,7 +35,7 @@ final class AttachDependencyParameter
         $route = $request->route();
 
         if (! $route->hasParameter($this->parameter)) {
-            /** @psalm-var \Illuminate\Http\Response */
+            /** @psalm-var \Symfony\Component\HttpFoundation\Response */
             return $next($request);
         }
 
@@ -48,7 +48,7 @@ final class AttachDependencyParameter
 
         $route->setParameter($this->parameter, $dependency);
 
-        /** @psalm-var \Illuminate\Http\Response */
+        /** @psalm-var \Symfony\Component\HttpFoundation\Response */
         return $next($request);
     }
 }
