@@ -8,8 +8,7 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Shrink\Conductor\ChecksDependencyStatus;
 use Shrink\Conductor\DescribesDependencyStatus;
-use Shrink\Conductor\Laravel\CollectsApplicationDependencies;
-use Shrink\Conductor\Laravel\Dependency;
+use Shrink\Conductor\Laravel\CollectsApplicationDependencyChecks;
 use Shrink\Conductor\Laravel\Http\ShowStatus;
 
 final class ShowStatusTest extends TestCase
@@ -31,15 +30,12 @@ final class ShowStatusTest extends TestCase
             ->method('dependencyStatus')
             ->willReturn($pass);
 
-        $dependency = new Dependency('passing', $passingCheck);
-
         $expectedResponse = json_encode([
-            'dependency' => 'passing',
             'status' => 'pass',
             'checkedAt' => '2018-01-01T00:00:00+00:00'
         ]);
 
-        $response = (new ShowStatus())->__invoke($dependency);
+        $response = (new ShowStatus())->__invoke($passingCheck);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($expectedResponse, $response->getContent());
@@ -62,15 +58,12 @@ final class ShowStatusTest extends TestCase
             ->method('dependencyStatus')
             ->willReturn($fail);
 
-        $dependency = new Dependency('failing', $failingCheck);
-
         $expectedResponse = json_encode([
-            'dependency' => 'failing',
             'status' => 'fail',
             'checkedAt' => '2018-01-01T00:00:00+00:00'
         ]);
 
-        $response = (new ShowStatus())->__invoke($dependency);
+        $response = (new ShowStatus())->__invoke($failingCheck);
 
         $this->assertSame(503, $response->getStatusCode());
         $this->assertEquals($expectedResponse, $response->getContent());

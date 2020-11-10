@@ -6,33 +6,28 @@ namespace Shrink\Conductor\Laravel\Http;
 
 use DateTimeInterface;
 use Illuminate\Http\JsonResponse;
-use Shrink\Conductor\Laravel\Dependency;
+use Shrink\Conductor\ChecksDependencyStatus;
 
 final class ShowStatus
 {
     /**
      * Execute a dependency check and create an HTTP Response using a status
-     * code to represent the state of the check.
+     * code to represent the status of the check.
      */
-    public function __invoke(Dependency $dependency): JsonResponse
+    public function __invoke(ChecksDependencyStatus $check): JsonResponse
     {
-        $status = $dependency->status();
-
-        $results = [
-            1 => ['pass', 200],
-            0 => ['fail', 503],
-        ];
-
-        [$label, $code] = $results[(int) $status->hasStatusCheckPassed()];
+        $status = $check->dependencyStatus();
 
         $description = [
-            'dependency' => $dependency->id(),
-            'status' => $label,
+            'status' => $status->hasStatusCheckPassed() ? 'pass' : 'fail',
             'checkedAt' => $status
                 ->statusCheckedAt()
                 ->format(DateTimeInterface::ATOM),
         ];
 
-        return new JsonResponse($description, $code);
+        return new JsonResponse(
+            $description,
+            $status->hasStatusCheckPassed() ? 200 : 503
+        );
     }
 }
