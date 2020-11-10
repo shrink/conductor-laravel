@@ -10,32 +10,28 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 use Shrink\Conductor\ChecksDependencyStatus;
-use Shrink\Conductor\Laravel\CollectsApplicationDependencies;
-use Shrink\Conductor\Laravel\Dependency;
-use Shrink\Conductor\Laravel\Http\AttachDependencyParameter;
+use Shrink\Conductor\Laravel\CollectsApplicationDependencyChecks;
+use Shrink\Conductor\Laravel\Http\AttachDependencyCheckParameter;
 use StdClass;
 
-final class AttachDependencyParameterTest extends TestCase
+final class AttachDependencyCheckParameterTest extends TestCase
 {
     /**
      * @test
      */
-    public function RouteParameterIsReplacedWithDependencyById(): void
+    public function RouteParameterIsReplacedWithCheckyById(): void
     {
-        $dependency = new Dependency(
-            'example-dependency',
-            $this->createMock(ChecksDependencyStatus::class)
-        );
+        $check = $this->createMock(ChecksDependencyStatus::class);
 
-        ($dependencies = $this->createMock(CollectsApplicationDependencies::class))
-            ->method('isDependencyRegistered')
+        ($checks = $this->createMock(CollectsApplicationDependencyChecks::class))
+            ->method('isDependencyCheckRegistered')
             ->with('example-dependency')
             ->willReturn(true);
 
-        $dependencies
-            ->method('dependencyById')
+        $checks
+            ->method('dependencyCheckById')
             ->with('example-dependency')
-            ->willReturn($dependency);
+            ->willReturn($check);
 
         ($route = $this->createMock(Route::class))
             ->method('hasParameter')
@@ -50,19 +46,19 @@ final class AttachDependencyParameterTest extends TestCase
         $route
             ->expects($this->once())
             ->method('setParameter')
-            ->with('dependency', $dependency);
+            ->with('dependency', $check);
 
         ($request = $this->createMock(Request::class))
             ->expects($this->any())
             ->method('route')
             ->willReturn($route);
 
-        $attachDependency = new AttachDependencyParameter(
-            $dependencies,
+        $attachDependencyCheck = new AttachDependencyCheckParameter(
+            $checks,
             'dependency'
         );
 
-        $attachDependency->handle(
+        $attachDependencyCheck->handle(
             $request,
             fn(Request $request): Response => new Response()
         );
@@ -73,12 +69,12 @@ final class AttachDependencyParameterTest extends TestCase
      */
     public function NoActionTakenForRequestWithoutDependencyParameter(): void
     {
-        ($dependencies = $this->createMock(CollectsApplicationDependencies::class))
+        ($checks = $this->createMock(CollectsApplicationDependencyChecks::class))
             ->expects($this->never())
-            ->method('dependencyById');
+            ->method('dependencyCheckById');
 
-        $attachDependency = new AttachDependencyParameter(
-            $dependencies,
+        $attachDependencyCheck = new AttachDependencyCheckParameter(
+            $checks,
             'dependency'
         );
 
@@ -92,7 +88,7 @@ final class AttachDependencyParameterTest extends TestCase
             ->method('route')
             ->willReturn($route);
 
-        $attachDependency->handle(
+        $attachDependencyCheck->handle(
             $request,
             fn(Request $request): Response => new Response()
         );
@@ -125,12 +121,12 @@ final class AttachDependencyParameterTest extends TestCase
             ->with($request)
             ->willReturn($expectedResponse);
 
-        $attachDependency = new AttachDependencyParameter(
-            $this->createMock(CollectsApplicationDependencies::class),
+        $attachDependencyCheck = new AttachDependencyCheckParameter(
+            $this->createMock(CollectsApplicationDependencyChecks::class),
             'dependency'
         );
 
-        $response = $attachDependency->handle(
+        $response = $attachDependencyCheck->handle(
             $request,
             Closure::fromCallable($next)
         );

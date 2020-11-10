@@ -5,28 +5,28 @@ declare(strict_types=1);
 namespace Shrink\Conductor\Laravel\Http;
 
 use Illuminate\Http\Request;
-use Shrink\Conductor\Laravel\CollectsApplicationDependencies;
+use Shrink\Conductor\Laravel\CollectsApplicationDependencyChecks;
 use Symfony\Component\HttpFoundation\Response;
 
-final class AttachDependencyParameter
+final class AttachDependencyCheckParameter
 {
-    private CollectsApplicationDependencies $dependencies;
+    private CollectsApplicationDependencyChecks $checks;
 
     /**
-     * Name of the route parameter to attach the dependency to.
+     * Name of the route parameter to attach the check to.
      */
     private string $parameter;
 
     public function __construct(
-        CollectsApplicationDependencies $dependencies,
+        CollectsApplicationDependencyChecks $checks,
         string $parameter
     ) {
-        $this->dependencies = $dependencies;
+        $this->checks = $checks;
         $this->parameter = $parameter;
     }
 
     /**
-     * Find dependency by identifier from parameter and attach dependency to
+     * Find dependency check by identifier from parameter and attach check to
      * route as a parameter.
      */
     public function handle(Request $request, callable $next): Response
@@ -42,11 +42,11 @@ final class AttachDependencyParameter
         /** @psalm-var string */
         $id = $route->parameter($this->parameter);
 
-        $dependency = $this->dependencies->dependencyById(
+        $check = $this->checks->dependencyCheckById(
             (string) $id
         );
 
-        $route->setParameter($this->parameter, $dependency);
+        $route->setParameter($this->parameter, $check);
 
         /** @psalm-var \Symfony\Component\HttpFoundation\Response */
         return $next($request);

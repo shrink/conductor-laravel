@@ -9,14 +9,38 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Support\ServiceProvider;
+use Lcobucci\Clock\Clock;
+use Shrink\Conductor\AggregateDependency;
 use Shrink\Conductor\Laravel\Dependencies\DatabaseSchema;
-use Shrink\Conductor\Laravel\Http\AttachDependencyParameter;
+use Shrink\Conductor\Laravel\Http\AttachDependencyCheckParameter;
 use Shrink\Conductor\Laravel\Http\ShowStatus;
 
 final class Conductor extends ServiceProvider
 {
     public function boot(Application $app, RouteRegistrar $registrar): void
     {
+        /** @psalm-var \Lcobucci\Clock\Clock */
+        $clock = $app->make(Clock::class);
+
+        $app->instance(
+            CollectsApplicationDependencyChecks::class,
+            $checks = new DependencyChecksArray()
+        );
+
+        $this->registerDatabaseChecks($app, $checks);
+
+        $checks->addDependencyCheck(
+            'application',
+            new AggregateDependency($clock, $checks->listDependencyChecks())
+        );
+
+        $this->registerHttpEndpoints($app, $registrar);
+    }
+
+    private function registerDatabaseChecks(
+        Application $app,
+        CollectsApplicationDependencyChecks $checks
+    ): void {
         $app->bind(Migrator::class, 'migrator');
 
         $app->when(DatabaseSchema::class)
@@ -24,22 +48,16 @@ final class Conductor extends ServiceProvider
             ->give((string) $app->basePath('database/migrations'));
 
         /** @psalm-var \Shrink\Conductor\Laravel\Dependencies\DatabaseSchema */
-        $databaseSchemaDependency = $app->make(DatabaseSchema::class);
+        $databaseSchemaCheck = $app->make(DatabaseSchema::class);
 
-        $dependencies = new DependenciesArray(
-            new Dependency('database', $databaseSchemaDependency)
-        );
-
-        $app->instance(CollectsApplicationDependencies::class, $dependencies);
-
-        $this->registerHttpEndpoints($app, $registrar);
+        $checks->addDependencyCheck('schema', $databaseSchemaCheck);
     }
 
     private function registerHttpEndpoints(
         Application $app,
         RouteRegistrar $registrar
     ): void {
-        $app->when(AttachDependencyParameter::class)
+        $app->when(AttachDependencyCheckParameter::class)
             ->needs('$parameter')
             ->give('dependency');
 
@@ -48,7 +66,7 @@ final class Conductor extends ServiceProvider
         };
 
         $registrar
-            ->middleware(AttachDependencyParameter::class)
+            ->middleware(AttachDependencyCheckParameter::class)
             ->prefix('.conductor')
             ->group($endpoints);
     }
