@@ -50,15 +50,18 @@ $app->bind(\Illuminate\Database\Migrations\Migrator::class, 'migrator');
 
 ### Define Dependencies
 
-A Dependency accepts a string identifier and an object that implements the
-`ChecksDependencyStatus` interface provided by Conductor.
+Define a Dependency with a string `id` and an instance of a
+`Shrink\Conductor\ChecksDependencyStatus`.
 
 ```php
-new Dependency(
-    'identifier',
-    new Shrink\Conductor\ChecksDependencyStatus::class
+$checks->addDependencyCheck(
+    'dependency-id',
+    Shrink\Conductor\ChecksDependencyStatus::class
 );
 ```
+
+See the included [Service Provider][conductor.php] for an example of dependency
+registration in action.
 
 ### Supported Dependency Checks
 
@@ -106,3 +109,4 @@ Conductor: Laravel is open-sourced software licensed under the
 [migrator-registration]: https://github.com/laravel/framework/blob/8.x/src/Illuminate/Database/MigrationServiceProvider.php
 [database-schema-dependency]: src/Laravel/Dependencies/DatabaseSchema.php
 [lcobucci-clock]: https://github.com/lcobucci/clock
+[conductor.php]: src/Laravel/Conductor.php
