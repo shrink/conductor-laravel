@@ -15,7 +15,7 @@ Laravel** is a set of Laravel runtime dependency checks.
 2. [**Enable**](#enable) Conductor with the optional Service Provider
 3. [**Define**](#define-dependencies) your application's runtime dependencies
 
-[&darr; Jump to **Dependencies** available for Laravel](#supported-dependencies)
+[&darr; Jump to **Dependencies** available for Laravel](#supported-dependency-checks)
 
 ### Install
 
