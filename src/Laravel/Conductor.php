@@ -9,48 +9,42 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Support\ServiceProvider;
-use Lcobucci\Clock\Clock;
-use Shrink\Conductor\AggregateDependency;
 use Shrink\Conductor\Laravel\Dependencies\DatabaseSchema;
 use Shrink\Conductor\Laravel\Http\AttachDependencyCheckParameter;
 use Shrink\Conductor\Laravel\Http\ShowStatus;
 
 final class Conductor extends ServiceProvider
 {
+    /**
+     * Bind a simple Dependency Collection and register HTTP endpoints which
+     * expose the status of each Dependency.
+     */
     public function boot(Application $app, RouteRegistrar $registrar): void
     {
-        /** @psalm-var \Lcobucci\Clock\Clock */
-        $clock = $app->make(Clock::class);
-
         $app->instance(
             CollectsApplicationDependencyChecks::class,
-            $checks = new DependencyChecksArray()
+            new DependencyChecksArray()
         );
 
-        $this->registerDatabaseChecks($app, $checks);
-
-        $checks->addDependencyCheck(
-            'application',
-            new AggregateDependency($clock, $checks->listDependencyChecks())
-        );
-
+        $this->bindDatabaseSchemaCheck($app);
         $this->registerHttpEndpoints($app, $registrar);
     }
 
-    private function registerDatabaseChecks(
-        Application $app,
-        CollectsApplicationDependencyChecks $checks
-    ): void {
+    /**
+     * The Database Schema Check cannot be resolved out of the Laravel container
+     * automatically because it depends on the Migrator, which Laravel does not
+     * register by its class name -- instead it is registered by a name
+     * ("migrator") -- so we must bind it by the class name. Additionally, the
+     * path to the database migrations on the filesystem must be explicitly
+     * bound.
+     */
+    private function bindDatabaseSchemaCheck(Application $app): void
+    {
         $app->bind(Migrator::class, 'migrator');
 
         $app->when(DatabaseSchema::class)
             ->needs('$migrationsPath')
             ->give((string) $app->basePath('database/migrations'));
-
-        /** @psalm-var \Shrink\Conductor\Laravel\Dependencies\DatabaseSchema */
-        $databaseSchemaCheck = $app->make(DatabaseSchema::class);
-
-        $checks->addDependencyCheck('schema', $databaseSchemaCheck);
     }
 
     private function registerHttpEndpoints(

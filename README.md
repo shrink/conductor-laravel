@@ -25,8 +25,8 @@ dev:~$ composer require shrink/conductor-laravel
 
 ### Enable
 
-An optional out-of-the-box [Service Provider][service-providers] registers an
-array of dependencies and an HTTP endpoint.
+An optional out-of-the-box [Service Provider][service-providers] registers the
+necessary instances (with sane default configuration) in the Laravel container.
 
 ```diff
 'providers' => [
@@ -36,32 +36,20 @@ array of dependencies and an HTTP endpoint.
 ];
 ```
 
-#### Without Package Service Provider
-
-The [Database Schema dependency](#database-schema) relies on the Database
-Migrator to determine Schema status, however because Laravel's standard
-behaviour is to
-[register the Migrator to a `migrator` alias][migrator-registration] you will
-need to re-bind `migrator` to the Migrator class name.
-
-```php
-$app->bind(\Illuminate\Database\Migrations\Migrator::class, 'migrator');
-```
-
 ### Define Dependencies
 
-Define a Dependency with a string `id` and an instance of a
-`Shrink\Conductor\ChecksDependencyStatus`.
+Add a Dependency to the Collection with a string `id` and an instance of a
+`Shrink\Conductor\ChecksDependencyStatus`. For example, to register a Database
+Schema dependency identified by `schema`:
 
 ```php
+$checks = $app->make(CollectsApplicationDependencyChecks::class);
+
 $checks->addDependencyCheck(
-    'dependency-id',
-    Shrink\Conductor\ChecksDependencyStatus::class
+    'schema',
+    $app->make(\Shrink\Conductor\Laravel\Dependencies\DatabaseSchema::class)
 );
 ```
-
-See the included [Service Provider][conductor.php] for an example of dependency
-registration in action.
 
 ### Supported Dependency Checks
 
