@@ -9,11 +9,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.4.10, 7.4]
+        php: [7, 7.4, 8, 8.0]
+        composer: [1, 2]
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: PHP_VERSION=${{ matrix.php }} docker-compose up --exit-code-from=validation
+        run: |
+          PHP_VERSION=${{ matrix.php }} COMPOSER_VERSION=${{ matrix.composer }} \
+          docker-compose up --force-recreate --build --exit-code-from=validation
       - name: Upload Test Artifacts
         uses: actions/upload-artifact@v2
         with:

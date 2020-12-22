@@ -5,8 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - PHP_VERSION=${PHP_VERSION:-7.4}
-        - COMPOSER_VERSION=${COMPOSER_VERSION:-1}
+        - PHP_VERSION=${PHP_VERSION:-8}
+        - COMPOSER_VERSION=${COMPOSER_VERSION:-2}
     tty: true
     volumes:
       - vendor:/srv/vendor
