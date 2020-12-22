@@ -4,7 +4,7 @@
   "description": "Laravel runtime dependency checks for Conductor",
   "license": "MIT",
   "require": {
-    "php": "^7.4",
+    "php": "^7.4 || ^8.0",
     "illuminate/database": "^8.0",
     "illuminate/support": "^8.0",
     "shrink/conductor": "^1.0",
@@ -12,9 +12,9 @@
     "illuminate/routing": "^8.0"
   },
   "require-dev": {
-    "nunomaduro/phpinsights": "^1.14",
     "phpunit/phpunit": "^9.0",
-    "vimeo/psalm": "^3.11"
+    "squizlabs/php_codesniffer": "^3.5",
+    "vimeo/psalm": "^4.3"
   },
   "autoload": {
     "psr-4": {
@@ -30,10 +30,10 @@
     "check": [
       "@test",
       "@static",
-      "@insights"
+      "@quality"
     ],
-    "insights": [
-      "vendor/bin/phpinsights --ansi --no-interaction --config-path=insights.php"
+    "quality": [
+      "vendor/bin/phpcs --standard=PSR12 src/"
     ],
     "static": [
       "vendor/bin/psalm --long-progress --report=psalm.junit.xml"

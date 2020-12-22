@@ -6,6 +6,7 @@ namespace Shrink\Conductor\Laravel;
 
 use InvalidArgumentException;
 use Shrink\Conductor\ChecksDependencyStatus;
+
 use function array_key_exists;
 use function preg_match;
 
