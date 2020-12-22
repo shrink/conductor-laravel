@@ -42,9 +42,7 @@ final class AttachDependencyCheckParameter
         /** @psalm-var string */
         $id = $route->parameter($this->parameter);
 
-        $check = $this->checks->dependencyCheckById(
-            (string) $id
-        );
+        $check = $this->checks->dependencyCheckById($id);
 
         $route->setParameter($this->parameter, $check);
 

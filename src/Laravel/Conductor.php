@@ -44,7 +44,7 @@ final class Conductor extends ServiceProvider
 
         $app->when(DatabaseSchema::class)
             ->needs('$migrationsPath')
-            ->give((string) $app->basePath('database/migrations'));
+            ->give($app->basePath('database/migrations'));
     }
 
     private function registerHttpEndpoints(
