@@ -9,8 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7, 7.4, 8, 8.0]
-        composer: [1, 2]
+        php: [8, 8.0.2, 8.1]
+        composer: [2]
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
@@ -20,6 +20,6 @@ jobs:
       - name: Upload Test Artifacts
         uses: actions/upload-artifact@v2
         with:
-          path: '*.junit.xml'
+          path: "*.junit.xml"
           name: test-reports-${{ matrix.php }}
           if-no-files-found: error
