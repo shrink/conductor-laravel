@@ -6,8 +6,8 @@
 Laravel** is a set of Laravel runtime dependency checks.
 
 > **Scenario**: I have a containerised Laravel application, I want to deploy a
-  new version which includes database migrations. How do I prevent the new
-  version from running against a database that has yet to be migrated?
+> new version which includes database migrations. How do I prevent the new
+> version from running against a database that has yet to be migrated?
 
 ## Usage
 
